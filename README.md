@@ -33,6 +33,7 @@ La aplicación cuenta con:
 * Operaciones CRUD.
 * Validaciones de datos.
 * Manejo de errores HTTP.
+* Middleware global de errores.
 * Pruebas automatizadas.
 * Documentación OpenAPI/Swagger.
 * Variables de entorno.
@@ -66,6 +67,10 @@ El proyecto utiliza una arquitectura por capas para separar las responsabilidade
 ```text
 proyecto_integrador_M2/
 │
+├── database/
+│   ├── setup.sql
+│   └── seed.sql
+│
 ├── docs/
 │   └── IA prompts/
 │
@@ -77,6 +82,9 @@ proyecto_integrador_M2/
 │   ├── db/
 │   │   ├── connection.js
 │   │   └── test-connection.js
+│   │
+│   ├── middlewares/
+│   │   └── error.middleware.js
 │   │
 │   ├── routes/
 │   │   ├── authors.routes.js
@@ -115,6 +123,26 @@ Service
 PostgreSQL
 ```
 
+Si ocurre un error que no es manejado previamente, el flujo pasa al middleware global:
+
+```text
+Cliente
+   ↓
+Route
+   ↓
+Controller
+   ↓
+Service
+   ↓
+PostgreSQL
+   ↓
+Error
+   ↓
+Middleware global de errores
+   ↓
+Respuesta HTTP 500
+```
+
 ### Routes
 
 Las rutas reciben las peticiones HTTP y las dirigen al controller correspondiente.
@@ -135,7 +163,7 @@ src/controllers/
 
 Los services contienen la lógica relacionada con el acceso y manipulación de los datos.
 
-Las consultas a PostgreSQL se realizan desde esta capa.
+Las consultas a PostgreSQL se realizan desde esta capa utilizando consultas parametrizadas.
 
 ```text
 src/services/
@@ -151,6 +179,16 @@ src/db/connection.js
 
 La configuración de la conexión utiliza variables de entorno.
 
+### Middlewares
+
+Los middlewares permiten agregar comportamientos comunes al procesamiento de las peticiones.
+
+El proyecto cuenta con un middleware global para manejar errores no controlados:
+
+```text
+src/middlewares/error.middleware.js
+```
+
 ### App y Server
 
 `app.js` configura la aplicación Express:
@@ -159,6 +197,7 @@ La configuración de la conexión utiliza variables de entorno.
 * Rutas.
 * Swagger.
 * Endpoint `/status`.
+* Middleware global de errores.
 
 `server.js` se encarga de iniciar el servidor HTTP.
 
@@ -169,6 +208,22 @@ Esta separación permite utilizar `app.js` en las pruebas sin necesidad de inici
 # Base de datos
 
 La aplicación utiliza PostgreSQL.
+
+Los scripts para crear la estructura y cargar datos iniciales se encuentran en:
+
+```text
+database/
+├── setup.sql
+└── seed.sql
+```
+
+### `setup.sql`
+
+Crea las tablas `authors` y `posts`, incluyendo sus claves primarias, restricciones y relación mediante clave foránea.
+
+### `seed.sql`
+
+Inserta datos iniciales de autores y publicaciones para facilitar las pruebas y el desarrollo.
 
 ## Tabla `authors`
 
@@ -241,6 +296,36 @@ npm install
 
 ---
 
+# Configuración de la base de datos
+
+Crear una base de datos PostgreSQL y un usuario con los permisos necesarios.
+
+Después ejecutar el script de estructura:
+
+```text
+database/setup.sql
+```
+
+y posteriormente el script de datos iniciales:
+
+```text
+database/seed.sql
+```
+
+Los scripts pueden ejecutarse desde `psql` utilizando:
+
+```sql
+\i 'ruta/al/proyecto/database/setup.sql'
+```
+
+y:
+
+```sql
+\i 'ruta/al/proyecto/database/seed.sql'
+```
+
+---
+
 # Variables de entorno
 
 Crear un archivo `.env` en la raíz del proyecto utilizando `.env.example` como referencia.
@@ -302,8 +387,8 @@ npm test
 La suite desarrollada cuenta actualmente con:
 
 ```text
-18 tests
-18 passing
+19 tests
+19 passing
 0 failing
 ```
 
@@ -327,6 +412,7 @@ Los tests cubren:
 * Verificación posterior a la eliminación.
 * Author inexistente durante eliminación.
 * Eliminación de authors.
+* Consulta de posts por author.
 
 ---
 
@@ -343,13 +429,14 @@ Los tests cubren:
 
 ## Posts
 
-| Método | Endpoint     | Descripción             |
-| ------ | ------------ | ----------------------- |
-| GET    | `/posts`     | Obtener todos los posts |
-| GET    | `/posts/:id` | Obtener un post por ID  |
-| POST   | `/posts`     | Crear un post           |
-| PUT    | `/posts/:id` | Actualizar un post      |
-| DELETE | `/posts/:id` | Eliminar un post        |
+| Método | Endpoint                  | Descripción                    |
+| ------ | ------------------------- | ------------------------------ |
+| GET    | `/posts`                  | Obtener todos los posts        |
+| GET    | `/posts/:id`              | Obtener un post por ID         |
+| GET    | `/posts/author/:authorId` | Obtener los posts de un author |
+| POST   | `/posts`                  | Crear un post                  |
+| PUT    | `/posts/:id`              | Actualizar un post             |
+| DELETE | `/posts/:id`              | Eliminar un post               |
 
 ---
 
@@ -395,6 +482,7 @@ Ejemplos de errores manejados:
 * Campos obligatorios faltantes.
 * Author o post inexistente.
 * Email de author duplicado.
+* Errores internos no controlados mediante el middleware global.
 
 ---
 
@@ -415,6 +503,12 @@ https://proyectointegradorm2-production-5daa.up.railway.app/api-docs
 ```
 
 Swagger permite consultar los endpoints, parámetros, respuestas y estructura de las operaciones disponibles.
+
+La documentación incluye la consulta de publicaciones por author:
+
+```text
+GET /posts/author/{authorId}
+```
 
 ---
 
@@ -468,7 +562,7 @@ Repositorio del proyecto:
 https://github.com/jmgc9601-pixel/proyecto_integrador_M2
 ```
 
-El repositorio contiene el código fuente, pruebas, documentación Swagger, configuración de ejemplo y documentación del proceso.
+El repositorio contiene el código fuente, pruebas, documentación Swagger, scripts de base de datos, configuración de ejemplo y documentación del proceso.
 
 Las credenciales reales y el archivo `.env` no forman parte del repositorio.
 
@@ -502,8 +596,8 @@ Durante el desarrollo se identificaron diferentes conceptos que inicialmente no 
 * Manejo de errores mediante `try/catch`.
 * Uso de códigos de estado HTTP.
 * Manejo de errores específicos de PostgreSQL.
-* Funcionamiento de claves primarias y claves foráneas.
-* Relaciones entre tablas y `ON DELETE CASCADE`.
+* Relaciones entre tablas y claves foráneas.
+* Uso de `ON DELETE CASCADE`.
 * Funcionamiento de pruebas automatizadas.
 * Diferencia entre `app.js` y `server.js`.
 * Propósito de OpenAPI y Swagger.
@@ -511,6 +605,7 @@ Durante el desarrollo se identificaron diferentes conceptos que inicialmente no 
 * Uso de Git para control de versiones.
 * Diferencias entre el entorno local y producción.
 * Conexión de una API con PostgreSQL en Railway.
+* Uso de middleware global para el manejo de errores.
 
 Estas dificultades fueron utilizadas como oportunidades para reforzar conocimientos de backend y mejorar progresivamente la comprensión de la arquitectura y funcionamiento de la aplicación.
 
@@ -537,10 +632,12 @@ El proyecto cuenta con:
 * ✅ API REST funcional.
 * ✅ PostgreSQL integrado.
 * ✅ Arquitectura por capas.
-* ✅ CRUD implementado.
+* ✅ Scripts de creación y seed de la base de datos.
+* ✅ Relación uno a muchos entre authors y posts.
 * ✅ Validaciones.
 * ✅ Manejo de errores.
-* ✅ 18 tests automatizados pasando.
+* ✅ Middleware global de errores.
+* ✅ 19 tests automatizados pasando.
 * ✅ Documentación OpenAPI.
 * ✅ Swagger UI.
 * ✅ Variables de entorno.

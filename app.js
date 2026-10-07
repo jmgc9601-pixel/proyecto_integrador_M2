@@ -1,6 +1,7 @@
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 
+const errorMiddleware = require("./src/middlewares/error.middleware");
 const swaggerDocument = require("./swagger.json");
 const authorsRoute = require("./src/routes/authors.routes");
 const postsRoute = require("./src/routes/posts.routes");
@@ -23,5 +24,7 @@ app.use(
     swaggerUi.serve,
     swaggerUi.setup(swaggerDocument)
 );
+
+app.use(errorMiddleware);
 
 module.exports = app;

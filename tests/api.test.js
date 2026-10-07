@@ -260,3 +260,14 @@ test("POST /authors debe devolver 409 si el email ya existe", async () => {
     assert.strictEqual(secondResponse.statusCode, 409);
     assert.strictEqual(secondResponse.body.error, "email already exists");
 });
+test("GET /posts/author/:authorId", async () => {
+    const response = await request(app)
+        .get("/posts/author/1");
+
+    assert.strictEqual(response.statusCode, 200);
+    assert.ok(Array.isArray(response.body));
+
+    for (const post of response.body) {
+        assert.strictEqual(post.author_id, 1);
+    }
+});

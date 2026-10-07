@@ -204,7 +204,39 @@
         }
       }
     },
-
+"/posts/author/{authorId}": {
+  "get": {
+    "tags": ["Posts"],
+    "summary": "Obtener posts por autor",
+    "parameters": [
+      {
+        "name": "authorId",
+        "in": "path",
+        "required": true,
+        "description": "ID del autor",
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Lista de posts del autor",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Post"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+},
     "/posts/{id}": {
       "get": {
         "tags": ["Posts"],

@@ -32,5 +32,12 @@ const deletePost = async (id) => {
     );
     return result.rows[0];
 };
+const getPostsByAuthor = async (authorId) => {
+const result = await pool.query(
+        "SELECT * FROM posts WHERE author_id = $1",
+        [authorId]
+    );
+    return result.rows;
+};
 
-module.exports = {getAllPosts, getPostById, createPost, updatePost, deletePost};
+module.exports = {getAllPosts, getPostById, createPost, updatePost, deletePost, getPostsByAuthor};
