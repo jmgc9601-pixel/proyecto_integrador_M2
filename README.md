@@ -499,7 +499,7 @@ http://localhost:3000/api-docs
 ## Producción
 
 ```text
-https://proyectointegradorm2-production-5daa.up.railway.app/api-docs
+https://proyectointegradorm2-production-fd16.up.railway.app/api-docs/
 ```
 
 Swagger permite consultar los endpoints, parámetros, respuestas y estructura de las operaciones disponibles.
@@ -519,19 +519,30 @@ La aplicación está desplegada en **Railway**.
 ## API en producción
 
 ```text
-https://proyectointegradorm2-production-5daa.up.railway.app
+https://proyectointegradorm2-production-fd16.up.railway.app/api-docs/
 ```
 
 ## Endpoint de estado
 
 ```text
-https://proyectointegradorm2-production-5daa.up.railway.app/status
+https://proyectointegradorm2-production-fd16.up.railway.app/status
 ```
 
-## Swagger
+## Authors
 
 ```text
-https://proyectointegradorm2-production-5daa.up.railway.app/api-docs
+https://proyectointegradorm2-production-fd16.up.railway.app/authors
+```
+## Posts
+
+```text
+https://proyectointegradorm2-production-fd16.up.railway.app/posts
+```
+
+## Posts por autor
+
+```text
+https://proyectointegradorm2-production-fd16.up.railway.app/posts/author/1
 ```
 
 La aplicación en producción está conectada a una instancia de PostgreSQL alojada en Railway.
