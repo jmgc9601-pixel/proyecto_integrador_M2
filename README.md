@@ -1,41 +1,67 @@
 # Proyecto Integrador M2 — Mini Blog API
 
-API REST desarrollada con Node.js, Express y PostgreSQL para gestionar autores y publicaciones.
+API REST desarrollada con **Node.js, Express y PostgreSQL** para gestionar autores y publicaciones.
+
+El proyecto fue desarrollado como parte del módulo M2 y tiene como objetivo aplicar conceptos de desarrollo backend, arquitectura REST, persistencia de datos, pruebas automatizadas, documentación de APIs y despliegue en producción.
+
+---
 
 ## Descripción
 
-Esta aplicación implementa una API REST con operaciones CRUD para dos recursos principales:
+La aplicación permite gestionar dos recursos principales:
 
-* **Authors**
-* **Posts**
+* **Authors:** autores de las publicaciones.
+* **Posts:** publicaciones asociadas a un autor.
 
-Cada post pertenece a un author mediante una relación de uno a muchos.
+La relación entre ambos recursos es de **uno a muchos**:
 
-La aplicación incluye:
+```text
+Author
+   │
+   ├── Post
+   ├── Post
+   └── Post
+```
 
-* Persistencia de datos con PostgreSQL.
-* Arquitectura separada en routes, controllers y services.
-* Validaciones y manejo de errores HTTP.
-* Tests automatizados con Node Test Runner y Supertest.
-* Documentación OpenAPI mediante Swagger UI.
-* Variables de entorno para configuración.
+Cada `post` pertenece obligatoriamente a un `author`.
+
+La aplicación cuenta con:
+
+* API REST.
+* PostgreSQL como sistema de persistencia.
+* Arquitectura separada por responsabilidades.
+* Operaciones CRUD.
+* Validaciones de datos.
+* Manejo de errores HTTP.
+* Pruebas automatizadas.
+* Documentación OpenAPI/Swagger.
+* Variables de entorno.
+* Repositorio Git/GitHub.
 * Despliegue en Railway.
+* PostgreSQL en producción.
 
-## Tecnologías
+---
 
-* Node.js
-* Express
-* PostgreSQL
-* `pg`
-* Supertest
-* Swagger UI Express
-* OpenAPI 3.0
-* Git / GitHub
-* Railway
+# Tecnologías utilizadas
 
-## Arquitectura
+* **Node.js**
+* **Express 5**
+* **PostgreSQL**
+* **node-postgres (`pg`)**
+* **Supertest**
+* **Node.js Test Runner**
+* **Swagger UI Express**
+* **OpenAPI 3.0**
+* **dotenv**
+* **Git**
+* **GitHub**
+* **Railway**
 
-El proyecto está organizado de la siguiente manera:
+---
+
+# Arquitectura del proyecto
+
+El proyecto utiliza una arquitectura por capas para separar las responsabilidades de cada parte de la aplicación.
 
 ```text
 proyecto_integrador_M2/
@@ -45,9 +71,20 @@ proyecto_integrador_M2/
 │
 ├── src/
 │   ├── controllers/
+│   │   ├── authors.controller.js
+│   │   └── posts.controller.js
+│   │
 │   ├── db/
+│   │   ├── connection.js
+│   │   └── test-connection.js
+│   │
 │   ├── routes/
+│   │   ├── authors.routes.js
+│   │   └── posts.routes.js
+│   │
 │   └── services/
+│       ├── authors.service.js
+│       └── posts.service.js
 │
 ├── tests/
 │   └── api.test.js
@@ -58,29 +95,141 @@ proyecto_integrador_M2/
 ├── server.js
 ├── package.json
 ├── package-lock.json
+├── README.md
 └── swagger.json
 ```
 
-El flujo de una petición es:
+## Flujo de una petición
+
+La aplicación separa el procesamiento de las peticiones en diferentes capas:
 
 ```text
-Client
-  ↓
+Cliente
+   ↓
 Route
-  ↓
+   ↓
 Controller
-  ↓
+   ↓
 Service
-  ↓
+   ↓
 PostgreSQL
 ```
 
-## Instalación
+### Routes
+
+Las rutas reciben las peticiones HTTP y las dirigen al controller correspondiente.
+
+```text
+src/routes/
+```
+
+### Controllers
+
+Los controllers reciben la petición, obtienen los datos necesarios, realizan validaciones relacionadas con la respuesta HTTP y determinan qué respuesta devolver al cliente.
+
+```text
+src/controllers/
+```
+
+### Services
+
+Los services contienen la lógica relacionada con el acceso y manipulación de los datos.
+
+Las consultas a PostgreSQL se realizan desde esta capa.
+
+```text
+src/services/
+```
+
+### Database
+
+La conexión con PostgreSQL se centraliza mediante un `Pool` de `pg`.
+
+```text
+src/db/connection.js
+```
+
+La configuración de la conexión utiliza variables de entorno.
+
+### App y Server
+
+`app.js` configura la aplicación Express:
+
+* Middleware.
+* Rutas.
+* Swagger.
+* Endpoint `/status`.
+
+`server.js` se encarga de iniciar el servidor HTTP.
+
+Esta separación permite utilizar `app.js` en las pruebas sin necesidad de iniciar manualmente el servidor.
+
+---
+
+# Base de datos
+
+La aplicación utiliza PostgreSQL.
+
+## Tabla `authors`
+
+```text
+authors
+├── id
+├── name
+├── email
+├── bio
+└── created_at
+```
+
+Características principales:
+
+* `id` como clave primaria.
+* `name` obligatorio.
+* `email` obligatorio y único.
+* `bio` opcional.
+* `created_at` generado automáticamente.
+
+## Tabla `posts`
+
+```text
+posts
+├── id
+├── author_id
+├── title
+├── content
+├── published
+└── created_at
+```
+
+`author_id` funciona como clave foránea hacia `authors.id`.
+
+```text
+posts.author_id
+       ↓
+authors.id
+```
+
+La relación utiliza:
+
+```sql
+ON DELETE CASCADE
+```
+
+Por lo tanto, al eliminar un author, PostgreSQL puede eliminar automáticamente los posts asociados.
+
+---
+
+# Instalación
 
 Clonar el repositorio:
 
 ```bash
 git clone https://github.com/jmgc9601-pixel/proyecto_integrador_M2.git
+```
+
+Ingresar al proyecto:
+
+```bash
 cd proyecto_integrador_M2
 ```
 
@@ -90,9 +239,11 @@ Instalar las dependencias:
 npm install
 ```
 
-## Variables de entorno
+---
 
-Crear un archivo `.env` en la raíz del proyecto tomando como referencia `.env.example`.
+# Variables de entorno
+
+Crear un archivo `.env` en la raíz del proyecto utilizando `.env.example` como referencia.
 
 Ejemplo:
 
@@ -104,58 +255,93 @@ DB_USER=api_user
 DB_PASSWORD=your_password_here
 ```
 
-El archivo `.env` contiene información sensible y no debe subirse al repositorio.
+El archivo `.env` contiene información sensible y está excluido del repositorio mediante `.gitignore`.
 
-## Ejecutar el proyecto
+El proyecto incluye `.env.example` para mostrar las variables necesarias sin exponer credenciales reales.
 
-Para iniciar el servidor:
+---
+
+# Ejecución local
+
+Para iniciar la aplicación:
 
 ```bash
 npm start
 ```
 
-La API local estará disponible en:
+La API estará disponible en:
 
 ```text
 http://localhost:3000
 ```
 
-Endpoint de comprobación:
+Endpoint de estado:
 
 ```text
 http://localhost:3000/status
 ```
 
-## Ejecutar los tests
+Respuesta esperada:
 
-La suite de pruebas se ejecuta con:
+```text
+API funcionando
+```
+
+---
+
+# Tests
+
+El proyecto utiliza el **Node.js Test Runner** junto con **Supertest** para probar los endpoints de la API.
+
+Ejecutar:
 
 ```bash
 npm test
 ```
 
-Actualmente el proyecto cuenta con **18 tests automatizados**, cubriendo:
+La suite desarrollada cuenta actualmente con:
 
-* Respuestas exitosas.
-* Validaciones.
-* Recursos inexistentes.
-* Conflictos por email duplicado.
-* CRUD de authors.
-* CRUD de posts.
+```text
+18 tests
+18 passing
+0 failing
+```
 
-## Endpoints
+Los tests cubren:
 
-### Authors
+* Endpoint de estado.
+* Listado de authors.
+* Consulta de author por ID.
+* Author inexistente.
+* Validación al crear authors.
+* Creación de authors.
+* Email duplicado.
+* Listado de posts.
+* Consulta de post por ID.
+* Post inexistente.
+* Creación de posts.
+* Validación al crear posts.
+* Actualización de posts.
+* Post inexistente durante actualización.
+* Eliminación de posts.
+* Verificación posterior a la eliminación.
+* Author inexistente durante eliminación.
+* Eliminación de authors.
+
+---
+
+# Endpoints
+
+## Authors
 
 | Método | Endpoint       | Descripción               |
 | ------ | -------------- | ------------------------- |
 | GET    | `/authors`     | Obtener todos los authors |
 | GET    | `/authors/:id` | Obtener un author por ID  |
 | POST   | `/authors`     | Crear un author           |
-| PUT    | `/authors/:id` | Actualizar un author      |
 | DELETE | `/authors/:id` | Eliminar un author        |
 
-### Posts
+## Posts
 
 | Método | Endpoint     | Descripción             |
 | ------ | ------------ | ----------------------- |
@@ -165,7 +351,9 @@ Actualmente el proyecto cuenta con **18 tests automatizados**, cubriendo:
 | PUT    | `/posts/:id` | Actualizar un post      |
 | DELETE | `/posts/:id` | Eliminar un post        |
 
-## Ejemplo de creación de author
+---
+
+# Ejemplo — Crear un author
 
 ```json
 {
@@ -175,7 +363,9 @@ Actualmente el proyecto cuenta con **18 tests automatizados**, cubriendo:
 }
 ```
 
-## Ejemplo de creación de post
+---
+
+# Ejemplo — Crear un post
 
 ```json
 {
@@ -186,125 +376,177 @@ Actualmente el proyecto cuenta con **18 tests automatizados**, cubriendo:
 }
 ```
 
-## Respuestas y manejo de errores
+---
 
-La API utiliza códigos HTTP para representar el resultado de cada operación.
+# Códigos HTTP utilizados
 
-| Código | Significado                            |
-| ------ | -------------------------------------- |
-| 200    | Operación exitosa                      |
-| 201    | Recurso creado                         |
-| 400    | Datos inválidos o author inexistente   |
-| 404    | Recurso no encontrado                  |
-| 409    | Conflicto, por ejemplo email duplicado |
-| 500    | Error interno del servidor             |
+| Código | Significado                |
+| ------ | -------------------------- |
+| 200    | Operación exitosa          |
+| 201    | Recurso creado             |
+| 400    | Datos inválidos            |
+| 404    | Recurso no encontrado      |
+| 409    | Conflicto                  |
+| 500    | Error interno del servidor |
 
-## Documentación OpenAPI
+Ejemplos de errores manejados:
 
-La documentación de la API está disponible mediante Swagger UI.
+* Author inexistente al crear un post.
+* Campos obligatorios faltantes.
+* Author o post inexistente.
+* Email de author duplicado.
 
-### Local
+---
+
+# Documentación OpenAPI / Swagger
+
+La API está documentada utilizando **OpenAPI 3.0** y **Swagger UI**.
+
+## Local
 
 ```text
 http://localhost:3000/api-docs
 ```
 
-### Producción
+## Producción
 
 ```text
 https://proyectointegradorm2-production-5daa.up.railway.app/api-docs
 ```
 
-## API desplegada
+Swagger permite consultar los endpoints, parámetros, respuestas y estructura de las operaciones disponibles.
 
-La API está desplegada en Railway.
+---
 
-URL base:
+# Despliegue
+
+La aplicación está desplegada en **Railway**.
+
+## API en producción
 
 ```text
 https://proyectointegradorm2-production-5daa.up.railway.app
 ```
 
-Endpoint de estado:
+## Endpoint de estado
 
 ```text
 https://proyectointegradorm2-production-5daa.up.railway.app/status
 ```
 
-## GitHub
+## Swagger
 
-Repositorio:
+```text
+https://proyectointegradorm2-production-5daa.up.railway.app/api-docs
+```
+
+La aplicación en producción está conectada a una instancia de PostgreSQL alojada en Railway.
+
+Se verificó la comunicación entre:
+
+```text
+Cliente
+   ↓
+Railway
+   ↓
+Express
+   ↓
+Services
+   ↓
+PostgreSQL
+```
+
+También se realizaron pruebas reales de creación de authors y posts en el entorno de producción.
+
+---
+
+# GitHub
+
+Repositorio del proyecto:
 
 ```text
 https://github.com/jmgc9601-pixel/proyecto_integrador_M2
 ```
 
-## Base de datos
+El repositorio contiene el código fuente, pruebas, documentación Swagger, configuración de ejemplo y documentación del proceso.
 
-La aplicación utiliza PostgreSQL con dos tablas principales:
+Las credenciales reales y el archivo `.env` no forman parte del repositorio.
 
-```text
-authors
-  │
-  └── id
-       ↓
-posts.author_id
-```
+---
 
-La relación entre ambos recursos es de uno a muchos:
+# Uso de Inteligencia Artificial
 
-* Un author puede tener muchos posts.
-* Cada post pertenece a un author.
-
-La relación utiliza una clave foránea con `ON DELETE CASCADE`.
-
-## Evidencias del proceso
-
-La carpeta `docs/IA prompts/` contiene material utilizado durante el proceso de desarrollo como evidencia y documentación del trabajo realizado.
-
-## Estado del proyecto
-
-Proyecto integrador desarrollado, probado y desplegado.
-
-* CRUD implementado.
-* Validaciones implementadas.
-* Manejo de errores implementado.
-* 18 tests automatizados pasando.
-* Documentación OpenAPI disponible.
-* Aplicación desplegada en Railway.
-* PostgreSQL configurado en producción.
-
-## Uso de Inteligencia Artificial
-
-Durante el desarrollo de este proyecto se utilizó **ChatGPT como herramienta de apoyo y tutoría técnica**.
+Durante el desarrollo del proyecto se utilizó **ChatGPT como herramienta de apoyo y tutoría técnica**.
 
 La inteligencia artificial se utilizó principalmente para:
 
-* Comprender conceptos de Node.js, Express, PostgreSQL, REST y arquitectura por capas.
-* Resolver dudas puntuales durante la implementación.
-* Analizar errores de código y mensajes provenientes de PostgreSQL, Node.js, PowerShell y Git.
-* Recibir explicaciones paso a paso sobre conceptos que no estaban completamente claros.
+* Comprender conceptos de Node.js, Express y PostgreSQL.
+* Resolver dudas durante la implementación.
+* Analizar errores de Node.js, PostgreSQL, PowerShell y Git.
+* Comprender la arquitectura por capas.
+* Recibir explicaciones paso a paso sobre conceptos que inicialmente no estaban claros.
 * Revisar la estructura y legibilidad del código.
-* Orientar la implementación de pruebas automatizadas con Supertest.
-* Comprender y configurar documentación OpenAPI/Swagger.
-* Recibir orientación durante la preparación del proyecto para GitHub y el despliegue en Railway.
+* Orientar la implementación de pruebas automatizadas.
+* Comprender y configurar OpenAPI y Swagger.
+* Recibir orientación sobre Git, GitHub y Railway.
+* Identificar oportunidades de mejora durante el desarrollo.
 
 El uso de IA se realizó principalmente como **herramienta de aprendizaje y acompañamiento**, procurando comprender cada solución y no limitarse a copiar código generado.
 
-### Oportunidades de mejora y aprendizaje
+## Oportunidades de mejora y aprendizaje
 
-Durante el desarrollo se identificaron algunos conceptos que inicialmente no estaban completamente claros y que representaron oportunidades de aprendizaje, entre ellos:
+Durante el desarrollo se identificaron diferentes conceptos que inicialmente no estaban completamente claros y que representaron oportunidades de aprendizaje:
 
-* Diferencias entre **CommonJS y ES Modules**.
-* Separación de responsabilidades entre **routes, controllers y services**.
-* Manejo de parámetros de ruta (`req.params`) y cuerpos de las peticiones (`req.body`).
-* Manejo de errores provenientes de PostgreSQL mediante `try/catch`.
-* Interpretación de códigos de error de PostgreSQL, como `23505` para violaciones de unicidad y `23503` para violaciones de claves foráneas.
-* Diferencia entre los códigos de estado HTTP y el contenido JSON de una respuesta.
-* Funcionamiento de pruebas automatizadas y el concepto de **tests independientes**.
-* Diferencia entre la aplicación Express (`app.js`) y el proceso que inicia el servidor (`server.js`).
-* Concepto y propósito de OpenAPI/Swagger como herramienta de documentación de una API.
-* Manejo de variables de entorno y diferencias entre configuración local y configuración de producción.
-* Proceso de versionado mediante Git y despliegue de una API con PostgreSQL en Railway.
+* Diferencias entre parámetros de ruta y datos enviados en el cuerpo de una petición.
+* Separación de responsabilidades entre routes, controllers y services.
+* Manejo de errores mediante `try/catch`.
+* Uso de códigos de estado HTTP.
+* Manejo de errores específicos de PostgreSQL.
+* Funcionamiento de claves primarias y claves foráneas.
+* Relaciones entre tablas y `ON DELETE CASCADE`.
+* Funcionamiento de pruebas automatizadas.
+* Diferencia entre `app.js` y `server.js`.
+* Propósito de OpenAPI y Swagger.
+* Manejo de variables de entorno.
+* Uso de Git para control de versiones.
+* Diferencias entre el entorno local y producción.
+* Conexión de una API con PostgreSQL en Railway.
 
-Estas dificultades fueron utilizadas como oportunidades para reforzar conceptos de backend y mejorar progresivamente la comprensión de la arquitectura y funcionamiento de la aplicación.
+Estas dificultades fueron utilizadas como oportunidades para reforzar conocimientos de backend y mejorar progresivamente la comprensión de la arquitectura y funcionamiento de la aplicación.
+
+---
+
+# Evidencias del proceso
+
+La carpeta:
+
+```text
+docs/IA prompts/
+```
+
+contiene capturas y material relacionado con el uso de inteligencia artificial durante el proceso de desarrollo.
+
+Estas evidencias permiten documentar parte del proceso de aprendizaje y acompañamiento utilizado durante la construcción del proyecto.
+
+---
+
+# Estado del proyecto
+
+El proyecto cuenta con:
+
+* ✅ API REST funcional.
+* ✅ PostgreSQL integrado.
+* ✅ Arquitectura por capas.
+* ✅ CRUD implementado.
+* ✅ Validaciones.
+* ✅ Manejo de errores.
+* ✅ 18 tests automatizados pasando.
+* ✅ Documentación OpenAPI.
+* ✅ Swagger UI.
+* ✅ Variables de entorno.
+* ✅ `.env.example`.
+* ✅ Git y GitHub.
+* ✅ Despliegue en Railway.
+* ✅ PostgreSQL en producción.
+* ✅ API pública funcionando.
+* ✅ Evidencias del proceso de aprendizaje.
