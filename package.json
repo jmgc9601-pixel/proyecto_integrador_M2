@@ -1,0 +1,22 @@
+{
+  "name": "proyecto_integrador_m2",
+  "version": "1.0.0",
+  "description": "API MINIBLOG",
+  "license": "ISC",
+  "author": "Juan Garcia",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "node --test tests/api.test.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "pg": "^8.23.1",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.1"
+  }
+}

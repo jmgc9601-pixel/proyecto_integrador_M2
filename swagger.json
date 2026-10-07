@@ -1,0 +1,445 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Proyecto Integrador M2 API",
+    "version": "1.0.0",
+    "description": "API REST para gestionar authors y posts"
+  },
+  "paths": {
+    "/authors": {
+      "get": {
+        "tags": ["Authors"],
+        "summary": "Obtener todos los authors",
+        "responses": {
+          "200": {
+            "description": "Lista de authors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Author"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Authors"],
+        "summary": "Crear un author",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Author creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Faltan name o email"
+          },
+          "409": {
+            "description": "El email ya existe"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+
+    "/authors/{id}": {
+      "get": {
+        "tags": ["Authors"],
+        "summary": "Obtener un author por ID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Author encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Author no encontrado"
+          }
+        }
+      },
+
+      "put": {
+        "tags": ["Authors"],
+        "summary": "Actualizar un author",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Author actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Author no encontrado"
+          }
+        }
+      },
+
+      "delete": {
+        "tags": ["Authors"],
+        "summary": "Eliminar un author",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Author eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Author"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Author no encontrado"
+          }
+        }
+      }
+    },
+
+    "/posts": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Obtener todos los posts",
+        "responses": {
+          "200": {
+            "description": "Lista de posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Post"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "post": {
+        "tags": ["Posts"],
+        "summary": "Crear un post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Post creado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos o author inexistente"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+
+    "/posts/{id}": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Obtener un post por ID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post no encontrado"
+          }
+        }
+      },
+
+      "put": {
+        "tags": ["Posts"],
+        "summary": "Actualizar un post",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "404": {
+            "description": "Post no encontrado"
+          }
+        }
+      },
+
+      "delete": {
+        "tags": ["Posts"],
+        "summary": "Eliminar un post",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Post"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post no encontrado"
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "parameters": {
+      "IdParam": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "ID del recurso",
+        "schema": {
+          "type": "integer",
+          "example": 2
+        }
+      }
+    },
+
+    "schemas": {
+      "Author": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 2
+          },
+          "name": {
+            "type": "string",
+            "example": "Elena Rostova"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "elena@example.com"
+          },
+          "bio": {
+            "type": "string",
+            "example": "Escritora y periodista."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-06T13:30:00.000Z"
+          }
+        }
+      },
+
+      "AuthorInput": {
+        "type": "object",
+        "required": ["name", "email"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Elena Rostova"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "elena@example.com"
+          },
+          "bio": {
+            "type": "string",
+            "example": "Escritora y periodista."
+          }
+        }
+      },
+
+      "Post": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 9
+          },
+          "author_id": {
+            "type": "integer",
+            "example": 2
+          },
+          "title": {
+            "type": "string",
+            "example": "El eco del silicio"
+          },
+          "content": {
+            "type": "string",
+            "example": "Contenido del post."
+          },
+          "published": {
+            "type": "boolean",
+            "example": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-06T13:30:00.000Z"
+          }
+        }
+      },
+
+      "PostInput": {
+        "type": "object",
+        "required": [
+          "author_id",
+          "title",
+          "content",
+          "published"
+        ],
+        "properties": {
+          "author_id": {
+            "type": "integer",
+            "example": 2
+          },
+          "title": {
+            "type": "string",
+            "example": "Mi primer post"
+          },
+          "content": {
+            "type": "string",
+            "example": "Contenido de mi primer post."
+          },
+          "published": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+
+      "PostUpdateInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "content",
+          "published"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Título actualizado"
+          },
+          "content": {
+            "type": "string",
+            "example": "Contenido actualizado."
+          },
+          "published": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      }
+    }
+  }
+}
